@@ -2,6 +2,8 @@
 #include <QGLShader>
 #include <QGLShaderProgram>
 #include "MyGLWidget.h"
+#include <QKeyEvent>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <iostream>
 
@@ -17,14 +19,18 @@ void MyGLWidget::initializeGL ()
   glewInit(); 
   glGetError();  // Reinicia la variable d'error d'OpenGL
 
+  //Inicialitzem vectors
+  translateVec = glm::vec3(0.,0.,0.);
+
   glClearColor (0.5, 0.7, 1.0, 1.0); // defineix color de fons (d'esborrat)
   loadShaders();
   createBuffers();
+  modelTransform();
 }
 
 void MyGLWidget::paintGL ()
 {
-  program->bind();
+
 
   glClear (GL_COLOR_BUFFER_BIT);  // Esborrem el frame-buffer
 
@@ -32,20 +38,23 @@ void MyGLWidget::paintGL ()
   glBindVertexArray(VAO[0]);
  
   // Pintem l'escena
-  glDrawArrays(GL_TRIANGLES, 0, 9);
+  glDrawArrays(GL_TRIANGLES, 0, 3);
   
-  // Desactivem el VAO
-  glBindVertexArray(0);
-  glBindVertexArray(VAO[1]);
-
-  glDrawArrays(GL_TRIANGLES,0,12);
-
   glBindVertexArray(0);
 }
 
 void MyGLWidget::resizeGL (int w, int h)
 {
   glViewport (0, 0, w, h);
+}
+
+void MyGLWidget::modelTransform() {
+    glm::mat4 TG = glm::translate(glm::mat4(1.0),translateVec);
+
+
+    //Passem al Vertex shader
+    GLint posTG = glGetUniformLocation(program->programId(),"TG");
+    glUniformMatrix4fv (posTG, 1, GL_FALSE, &TG[0][0]);
 }
 
 void MyGLWidget::createBuffers ()
@@ -99,5 +108,33 @@ void MyGLWidget::loadShaders(){
     program->addShader(&fs);
     program->addShader(&vs);
     program->link();
+    program->bind();
+}
+
+void MyGLWidget::keyPressEvent(QKeyEvent *e) {
+    switch (e->key()) {
+        case Qt::Key_Left:
+            translateVec = translateVec + glm::vec3(-0.01,0.,0.);
+            modelTransform();
+            updateGL();
+            break;
+        case Qt::Key_Right:
+            translateVec = translateVec + glm::vec3(+0.01,0.,0.);
+            modelTransform();
+            updateGL();
+            break;
+        case Qt::Key_Up:
+            translateVec = translateVec + glm::vec3(0.,+0.01,0.);
+            modelTransform();
+            updateGL();
+            break;
+        case Qt::Key_Down:
+            translateVec = translateVec + glm::vec3(0.,-0.01,0.);
+            modelTransform();
+            updateGL();
+            break;
+        default:
+            break;
+    }
 }
 

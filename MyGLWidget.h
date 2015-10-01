@@ -2,6 +2,7 @@
 #include "glm/glm.hpp"
 #include <QGLShader>
 #include <QGLShaderProgram>
+#include <glm/gtc/matrix_transform.hpp>
 
 class MyGLWidget : public QGLWidget 
 {
@@ -21,14 +22,19 @@ class MyGLWidget : public QGLWidget
     // resizeGL() - Es cridat quan canvi la mida del widget
     virtual void resizeGL (int width, int height);  
 
+    virtual void keyPressEvent(QKeyEvent * e);
+
   private:
     void createBuffers ();
 
     void loadShaders();
 
+    void modelTransform();
+
 
     GLuint VAO[2],VBO,VBO2,VBOTC;
     GLint  color_loc;
     QGLShaderProgram *program;
+    glm::vec3 translateVec;
 
 };
