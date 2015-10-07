@@ -22,8 +22,8 @@ void MyGLWidget::initializeGL ()
   glClearColor (0.5, 0.7, 1.0, 1.0); // defineix color de fons (d'esborrat)
   loadShaders();
   createBuffers();
-  TG = glm::mat4(1.);
-  modelTransform();
+  transVec = glm::vec3(0.);
+  modelTransform(glm::vec3(0.));
 }
 
 void MyGLWidget::paintGL ()
@@ -46,12 +46,17 @@ void MyGLWidget::resizeGL (int w, int h)
   glViewport (0, 0, w, h);
 }
 
-void MyGLWidget::modelTransform() {
-    float radians = 0.785398;
-    glm::mat4 tmp=glm::rotate(TG,radians,glm::vec3(0.,0.,1.));
+void MyGLWidget::modelTransform(const glm::vec3& transChange) {
+    float rad = 0.785398;
+    glm::mat4 TG = glm::mat4(1.f);
+    TG = glm::rotate(TG,rad,glm::vec3(0.,0.,1.));
+    transVec = transVec+transChange;
+    TG = glm::translate(TG,transVec);
+
+
     //Passem al Vertex shader
     GLint posTG = glGetUniformLocation(program->programId(),"TG");
-    glUniformMatrix4fv (posTG, 1, GL_FALSE, &tmp[0][0]);
+    glUniformMatrix4fv (posTG, 1, GL_FALSE, &TG[0][0]);
 }
 
 void MyGLWidget::createBuffers ()
@@ -111,21 +116,20 @@ void MyGLWidget::loadShaders(){
 void MyGLWidget::keyPressEvent(QKeyEvent *e) {
     switch (e->key()) {
         case Qt::Key_Left:
-            TG = glm::translate(TG,glm::vec3(-0.01,0.,0.));
+            modelTransform(glm::vec3(-0.01,0.,0.));
             break;
         case Qt::Key_Right:
-            TG = glm::translate(TG,glm::vec3(+0.01,0.,0.));
+            modelTransform(glm::vec3(+0.01,0.,0.));
             break;
         case Qt::Key_Up:
-            TG = glm::translate(TG,glm::vec3(0.,+0.01,0.));
+            modelTransform(glm::vec3(0.,+0.01,0.));
             break;
         case Qt::Key_Down:
-            TG = glm::translate(TG,glm::vec3(0.,-0.01,0.));
+            modelTransform(glm::vec3(0.,-0.01,0.));
             break;
         default:
             break;
     }
-    modelTransform();
     updateGL();
 }
 

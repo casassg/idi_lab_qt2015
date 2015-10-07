@@ -31,12 +31,12 @@ class MyGLWidget : public QGLWidget
 
     void loadShaders();
 
-    void modelTransform();
+    void modelTransform(const glm::vec3& transChange);
 
 
     GLuint VAO[2],VBO,VBO2,VBOTC;
     GLint  color_loc;
     QGLShaderProgram *program;
-    glm::mat4 TG;
+    glm::vec3 transVec;
 
 };
