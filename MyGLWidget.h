@@ -3,6 +3,8 @@
 #include <QGLShader>
 #include <QGLShaderProgram>
 #include <glm/gtc/matrix_transform.hpp>
+#define GLM_FORCE_RADIANS
+
 
 class MyGLWidget : public QGLWidget 
 {

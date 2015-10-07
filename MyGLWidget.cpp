@@ -22,6 +22,7 @@ void MyGLWidget::initializeGL ()
   glClearColor (0.5, 0.7, 1.0, 1.0); // defineix color de fons (d'esborrat)
   loadShaders();
   createBuffers();
+  TG = glm::mat4(1.);
   modelTransform();
 }
 
@@ -46,9 +47,11 @@ void MyGLWidget::resizeGL (int w, int h)
 }
 
 void MyGLWidget::modelTransform() {
+    float radians = 0.785398;
+    glm::mat4 tmp=glm::rotate(TG,radians,glm::vec3(0.,0.,1.));
     //Passem al Vertex shader
     GLint posTG = glGetUniformLocation(program->programId(),"TG");
-    glUniformMatrix4fv (posTG, 1, GL_FALSE, &TG[0][0]);
+    glUniformMatrix4fv (posTG, 1, GL_FALSE, &tmp[0][0]);
 }
 
 void MyGLWidget::createBuffers ()
@@ -109,26 +112,20 @@ void MyGLWidget::keyPressEvent(QKeyEvent *e) {
     switch (e->key()) {
         case Qt::Key_Left:
             TG = glm::translate(TG,glm::vec3(-0.01,0.,0.));
-            modelTransform();
-            updateGL();
             break;
         case Qt::Key_Right:
             TG = glm::translate(TG,glm::vec3(+0.01,0.,0.));
-            modelTransform();
-            updateGL();
             break;
         case Qt::Key_Up:
             TG = glm::translate(TG,glm::vec3(0.,+0.01,0.));
-            modelTransform();
-            updateGL();
             break;
         case Qt::Key_Down:
             TG = glm::translate(TG,glm::vec3(0.,-0.01,0.));
-            modelTransform();
-            updateGL();
             break;
         default:
             break;
     }
+    modelTransform();
+    updateGL();
 }
 
