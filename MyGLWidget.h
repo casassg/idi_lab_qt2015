@@ -35,6 +35,6 @@ class MyGLWidget : public QGLWidget
     GLuint VAO[2],VBO,VBO2,VBOTC;
     GLint  color_loc;
     QGLShaderProgram *program;
-    glm::vec3 translateVec;
+    glm::mat4 TG;
 
 };

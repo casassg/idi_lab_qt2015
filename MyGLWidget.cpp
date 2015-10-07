@@ -19,9 +19,6 @@ void MyGLWidget::initializeGL ()
   glewInit(); 
   glGetError();  // Reinicia la variable d'error d'OpenGL
 
-  //Inicialitzem vectors
-  translateVec = glm::vec3(0.,0.,0.);
-
   glClearColor (0.5, 0.7, 1.0, 1.0); // defineix color de fons (d'esborrat)
   loadShaders();
   createBuffers();
@@ -49,9 +46,6 @@ void MyGLWidget::resizeGL (int w, int h)
 }
 
 void MyGLWidget::modelTransform() {
-    glm::mat4 TG = glm::translate(glm::mat4(1.0),translateVec);
-
-
     //Passem al Vertex shader
     GLint posTG = glGetUniformLocation(program->programId(),"TG");
     glUniformMatrix4fv (posTG, 1, GL_FALSE, &TG[0][0]);
@@ -114,22 +108,22 @@ void MyGLWidget::loadShaders(){
 void MyGLWidget::keyPressEvent(QKeyEvent *e) {
     switch (e->key()) {
         case Qt::Key_Left:
-            translateVec = translateVec + glm::vec3(-0.01,0.,0.);
+            TG = glm::translate(TG,glm::vec3(-0.01,0.,0.));
             modelTransform();
             updateGL();
             break;
         case Qt::Key_Right:
-            translateVec = translateVec + glm::vec3(+0.01,0.,0.);
+            TG = glm::translate(TG,glm::vec3(+0.01,0.,0.));
             modelTransform();
             updateGL();
             break;
         case Qt::Key_Up:
-            translateVec = translateVec + glm::vec3(0.,+0.01,0.);
+            TG = glm::translate(TG,glm::vec3(0.,+0.01,0.));
             modelTransform();
             updateGL();
             break;
         case Qt::Key_Down:
-            translateVec = translateVec + glm::vec3(0.,-0.01,0.);
+            TG = glm::translate(TG,glm::vec3(0.,-0.01,0.));
             modelTransform();
             updateGL();
             break;
