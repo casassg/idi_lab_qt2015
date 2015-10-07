@@ -49,9 +49,9 @@ void MyGLWidget::resizeGL (int w, int h)
 void MyGLWidget::modelTransform(const glm::vec3& transChange) {
     float rad = 0.785398;
     glm::mat4 TG = glm::mat4(1.f);
-    TG = glm::rotate(TG,rad,glm::vec3(0.,0.,1.));
     transVec = transVec+transChange;
     TG = glm::translate(TG,transVec);
+    TG = glm::rotate(TG,rad,glm::vec3(0.,0.,1.));
 
 
     //Passem al Vertex shader
