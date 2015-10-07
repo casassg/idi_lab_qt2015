@@ -23,7 +23,7 @@ void MyGLWidget::initializeGL ()
   loadShaders();
   createBuffers();
   transVec = glm::vec3(0.);
-  modelTransform(glm::vec3(0.));
+  modelTransform(glm::vec3(0.),1.);
 }
 
 void MyGLWidget::paintGL ()
@@ -46,12 +46,14 @@ void MyGLWidget::resizeGL (int w, int h)
   glViewport (0, 0, w, h);
 }
 
-void MyGLWidget::modelTransform(const glm::vec3& transChange) {
+void MyGLWidget::modelTransform(const glm::vec3& transChange,double scaleChange) {
     float rad = 0.785398;
     glm::mat4 TG = glm::mat4(1.f);
     transVec = transVec+transChange;
     TG = glm::translate(TG,transVec);
     TG = glm::rotate(TG,rad,glm::vec3(0.,0.,1.));
+    scale = scale + scaleChange;
+    TG = glm::scale(TG,glm::vec3(scale));
 
 
     //Passem al Vertex shader
@@ -116,16 +118,22 @@ void MyGLWidget::loadShaders(){
 void MyGLWidget::keyPressEvent(QKeyEvent *e) {
     switch (e->key()) {
         case Qt::Key_Left:
-            modelTransform(glm::vec3(-0.01,0.,0.));
+            modelTransform(glm::vec3(-0.01,0.,0.),0.);
             break;
         case Qt::Key_Right:
-            modelTransform(glm::vec3(+0.01,0.,0.));
+            modelTransform(glm::vec3(+0.01,0.,0.),0.);
             break;
         case Qt::Key_Up:
-            modelTransform(glm::vec3(0.,+0.01,0.));
+            modelTransform(glm::vec3(0.,+0.01,0.),0.);
             break;
         case Qt::Key_Down:
-            modelTransform(glm::vec3(0.,-0.01,0.));
+            modelTransform(glm::vec3(0.,-0.01,0.),0.);
+            break;
+        case Qt::Key_S:
+            modelTransform(glm::vec3(0.,0.,0.),0.01);
+            break;
+        case Qt::Key_D:
+            modelTransform(glm::vec3(0.,0.,0.),-0.01);
             break;
         default:
             break;
