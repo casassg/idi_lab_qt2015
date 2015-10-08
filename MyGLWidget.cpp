@@ -20,6 +20,8 @@ void MyGLWidget::initializeGL ()
   carregaShaders();
   createBuffers();
   modelTransform ();
+  projectTransform();
+  viewTransform();
 }
 
 void MyGLWidget::paintGL () 
@@ -48,6 +50,18 @@ void MyGLWidget::modelTransform ()
   glm::mat4 transform = glm::scale(glm::mat4(1.0f), glm::vec3(scale));
   transform = glm::rotate(transform, .58f, glm::vec3(1.,0.,0.));
   glUniformMatrix4fv(transLoc, 1, GL_FALSE, &transform[0][0]);
+}
+
+void MyGLWidget::projectTransform ()
+{
+    glm::mat4 project = glm::perspective(M_PI/2.,1.,1.,3.);
+    glUniformMatrix4fv(projLoc,1,GL_FALSE,&project[0][0]);
+}
+
+void MyGLWidget::viewTransform ()
+{
+    glm::mat4 view = glm::lookAt(glm::vec3(0.,0.,2.),glm::vec3(0.,0.,0.),glm::vec3(0.,1.,0.));
+    glUniformMatrix4fv(viewLoc,1,GL_FALSE,&view[0][0]);
 }
 
 void MyGLWidget::resizeGL (int w, int h) 
@@ -159,8 +173,8 @@ void MyGLWidget::carregaShaders()
   QGLShader fs (QGLShader::Fragment, this);
   QGLShader vs (QGLShader::Vertex, this);
   // Carreguem el codi dels fitxers i els compilem
-  fs.compileSourceFile("shaders/fragshad.frag");
-  vs.compileSourceFile("shaders/vertshad.vert");
+  fs.compileSourceFile(":/shaders/fragshad.frag");
+  vs.compileSourceFile(":/shaders/vertshad.vert");
   // Creem el program
   program = new QGLShaderProgram(this);
   // Li afegim els shaders corresponents
@@ -177,5 +191,7 @@ void MyGLWidget::carregaShaders()
   colorLoc = glGetAttribLocation (program->programId(), "color");
   // Uniform locations
   transLoc = glGetUniformLocation(program->programId(), "TG");
+  projLoc = glGetUniformLocation(program->programId(), "proj");
+  viewLoc = glGetUniformLocation(program->programId(), "view");
 }
 
