@@ -12,7 +12,7 @@ class MyGLWidget : public QGLWidget {
   public:
     MyGLWidget (QGLFormat &f, QWidget *parent=0);
 
-  protected:
+protected:
     // initializeGL - Aqui incluim les inicialitzacions del contexte grafic.
     virtual void initializeGL ( );
     // paintGL - Mètode cridat cada cop que cal refrescar la finestra.
@@ -29,6 +29,8 @@ class MyGLWidget : public QGLWidget {
     void modelTransform ();
     void projectTransform ();
     void viewTransform ();
+    void paintTerra();
+    void paintCasa();
 
     // attribute locations
     GLuint vertexLoc, colorLoc;
