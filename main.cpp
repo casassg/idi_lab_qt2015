@@ -2,9 +2,8 @@
 
 #include "MyGLWidget.h"
 
-int main (int argc, char **argv) 
-{
-  QApplication a(argc, argv);
+int main (int argc, char **argv) {
+  QApplication a( argc, argv);
 
   QGLFormat format;
   format.setDepthBufferSize(24);
@@ -13,7 +12,8 @@ int main (int argc, char **argv)
   QGLFormat::setDefaultFormat(format);
   MyGLWidget mygl(format);
   mygl.resize (800, 800);
-  mygl.show();
+  mygl.show ();
 
-  return a.exec();
+  return a.exec ();
 }
+
