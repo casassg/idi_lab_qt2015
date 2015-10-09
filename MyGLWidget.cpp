@@ -16,6 +16,9 @@ void MyGLWidget::initializeGL ()
     glEnable (GL_DEPTH_TEST);
     glewInit();
     glGetError();  // Reinicia la variable d'error d'OpenGL
+    homer.load("models/HomerProves.obj");
+
+
 
     glClearColor(0.5, 0.7, 1.0, 1.0); // defineix color de fons (d'esborrat)
     carregaShaders();
@@ -25,12 +28,12 @@ void MyGLWidget::initializeGL ()
     viewTransform();
 }
 
-void MyGLWidget::paintCasa()
+void MyGLWidget::paintHomer()
 {
     // Activem el VAO per a pintar la caseta
-    glBindVertexArray (VAO_Casa);
+    glBindVertexArray (VAO_Homer);
     // pintem
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 5);
+    glDrawArrays (GL_TRIANGLES, 0, homer.faces().size () * 3);
 }
 
 void MyGLWidget::paintTerra()
@@ -48,7 +51,7 @@ void MyGLWidget::paintGL ()
     // Esborrem el frame-buffer
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    paintCasa();
+    paintHomer();
     paintTerra();
 
 
@@ -122,12 +125,12 @@ void MyGLWidget::createBuffers ()
     };
 
     // Creació del Vertex Array Object per pintar
-    glGenVertexArrays(1, &VAO_Casa);
-    glBindVertexArray(VAO_Casa);
+    glGenVertexArrays(1, &VAO_Homer);
+    glBindVertexArray(VAO_Homer);
 
     glGenBuffers(1, &VBO_CasaPos);
     glBindBuffer(GL_ARRAY_BUFFER, VBO_CasaPos);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(posicio), posicio, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * homer.faces().size() * 3 * 3, homer.VBO_vertices(), GL_STATIC_DRAW);
 
     // Activem l'atribut vertexLoc
     glVertexAttribPointer(vertexLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);

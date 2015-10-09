@@ -3,6 +3,7 @@
 #include <QGLShader>
 #include <QGLShaderProgram>
 #include <QKeyEvent>
+#include "model.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
@@ -30,19 +31,20 @@ protected:
     void projectTransform ();
     void viewTransform ();
     void paintTerra();
-    void paintCasa();
+    void paintHomer();
 
     // attribute locations
     GLuint vertexLoc, colorLoc;
     // uniform locations
     GLuint transLoc,projLoc,viewLoc;
     // VAO i VBO names
-    GLuint VAO_Casa, VBO_CasaPos, VBO_CasaCol;
+    GLuint VAO_Homer, VBO_CasaPos, VBO_CasaCol;
     GLuint VAO_Terra, VBO_TerraPos, VBO_TerraCol;
     // Program
     QGLShaderProgram *program;
     // Internal vars
     float scale;
     glm::vec3 pos;
+    Model homer;
 };
 
