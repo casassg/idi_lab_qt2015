@@ -43,7 +43,8 @@ protected:
     // Program
     QGLShaderProgram *program;
     // Internal vars
-    float scale;
+    float scale, rotateH,rotate;
+
     glm::vec3 pos;
     Model homer;
 };

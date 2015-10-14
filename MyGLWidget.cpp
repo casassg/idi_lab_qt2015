@@ -30,6 +30,10 @@ void MyGLWidget::initializeGL ()
 
 void MyGLWidget::paintHomer()
 {
+    float temp = rotate;
+    rotate=rotateH;
+    modelTransform();
+    rotate = temp;
     // Activem el VAO per a pintar la caseta
     glBindVertexArray (VAO_Homer);
     // pintem
@@ -38,6 +42,8 @@ void MyGLWidget::paintHomer()
 
 void MyGLWidget::paintTerra()
 {
+
+    modelTransform();
 
     // Activem el VAO per a pintar el terra
     glBindVertexArray (VAO_Terra);
@@ -62,7 +68,8 @@ void MyGLWidget::paintGL ()
 void MyGLWidget::modelTransform () 
 {
     // Matriu de transformació de model
-    glm::mat4 transform = glm::scale(glm::mat4(1.0f), glm::vec3(scale));
+    glm::mat4 transform = glm::rotate(glm::mat4(1.0f),rotate,glm::vec3(0.,1.,0.));
+    transform = glm::scale(transform, glm::vec3(scale));
     transform = glm::rotate(transform, .58f, glm::vec3(1.,0.,0.));
     glUniformMatrix4fv(transLoc, 1, GL_FALSE, &transform[0][0]);
 }
@@ -97,6 +104,12 @@ void MyGLWidget::keyPressEvent(QKeyEvent* event)
     }
     case Qt::Key_D: { // escalar a més petit
         scale -= 0.05;
+        modelTransform ();
+        updateGL();
+        break;
+    }
+    case Qt::Key_R: {
+        rotateH+=M_PI/4;
         modelTransform ();
         updateGL();
         break;
