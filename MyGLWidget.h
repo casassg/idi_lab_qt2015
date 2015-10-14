@@ -38,7 +38,7 @@ protected:
     // uniform locations
     GLuint transLoc,projLoc,viewLoc;
     // VAO i VBO names
-    GLuint VAO_Homer, VBO_CasaPos, VBO_CasaCol;
+    GLuint VAO_Homer, VBO_Homer, VBO_HomerCol;
     GLuint VAO_Terra, VBO_TerraPos, VBO_TerraCol;
     // Program
     QGLShaderProgram *program;

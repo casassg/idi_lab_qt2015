@@ -107,38 +107,21 @@ void MyGLWidget::keyPressEvent(QKeyEvent* event)
 
 void MyGLWidget::createBuffers () 
 {
-    // Dades de la caseta
-    // Dos VBOs, un amb posició i l'altre amb color
-    glm::vec3 posicio[5] = {
-        glm::vec3(-0.5, -1.0, 0.0),
-        glm::vec3( 0.5, -1.0, 0.0),
-        glm::vec3(-0.5,  0.0, 0.0),
-        glm::vec3( 0.5,  0.0, 0.0),
-        glm::vec3( 0.0,  0.6, 0.0)
-    };
-    glm::vec3 color[5] = {
-        glm::vec3(1,0,0),
-        glm::vec3(0,1,0),
-        glm::vec3(0,0,1),
-        glm::vec3(1,0,0),
-        glm::vec3(0,1,0)
-    };
-
     // Creació del Vertex Array Object per pintar
     glGenVertexArrays(1, &VAO_Homer);
     glBindVertexArray(VAO_Homer);
 
-    glGenBuffers(1, &VBO_CasaPos);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_CasaPos);
+    glGenBuffers(1, &VBO_Homer);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_Homer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * homer.faces().size() * 3 * 3, homer.VBO_vertices(), GL_STATIC_DRAW);
 
     // Activem l'atribut vertexLoc
     glVertexAttribPointer(vertexLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(vertexLoc);
 
-    glGenBuffers(1, &VBO_CasaCol);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_CasaCol);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
+    glGenBuffers(1, &VBO_HomerCol);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_HomerCol);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * homer.faces().size() * 3 * 3, homer.VBO_matdiff(), GL_STATIC_DRAW);
 
     // Activem l'atribut colorLoc
     glVertexAttribPointer(colorLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
