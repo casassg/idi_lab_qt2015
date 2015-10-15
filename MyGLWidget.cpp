@@ -1,5 +1,6 @@
 #include <GL/glew.h>
 #include "MyGLWidget.h"
+#include <cmath>
 
 #include <iostream>
 
@@ -16,9 +17,10 @@ void MyGLWidget::initializeGL ()
     glEnable (GL_DEPTH_TEST);
     glewInit();
     glGetError();  // Reinicia la variable d'error d'OpenGL
+
     homer.load("models/HomerProves.obj");
 
-
+    ra=1;
 
     glClearColor(0.5, 0.7, 1.0, 1.0); // defineix color de fons (d'esborrat)
     carregaShaders();
@@ -74,9 +76,19 @@ void MyGLWidget::modelTransform ()
     glUniformMatrix4fv(transLoc, 1, GL_FALSE, &transform[0][0]);
 }
 
+double calcFOV(double ra, double initialFOV) {
+    if(ra>=1)return initialFOV;
+    else {
+        double alpha = initialFOV/2;
+        double newAlpha = atan(tan(alpha)/ra);
+        return newAlpha*2;
+    }
+}
+
 void MyGLWidget::projectTransform ()
 {
-    glm::mat4 project = glm::perspective(M_PI/2.,1.,1.,3.);
+    double fov = calcFOV(ra,M_PI/2.);
+    glm::mat4 project = glm::perspective(fov,ra,1.,3.);
     glUniformMatrix4fv(projLoc,1,GL_FALSE,&project[0][0]);
 }
 
@@ -88,6 +100,9 @@ void MyGLWidget::viewTransform ()
 
 void MyGLWidget::resizeGL (int w, int h) 
 {
+    ra = (double)w/(double)h;
+    projectTransform();
+    updateGL();
     glViewport(0, 0, w, h);
 }
 
@@ -149,10 +164,10 @@ void MyGLWidget::createBuffers ()
         glm::vec3(1.0, -1.0, 1.0)
     };
     glm::vec3 colterra[4] = {
-        glm::vec3(1,0,1),
-        glm::vec3(1,0,1),
-        glm::vec3(1,0,1),
-        glm::vec3(1,0,1)
+        glm::vec3(48./255.,63./255.,159./255.),
+        glm::vec3(48./255.,63./255.,159./255.),
+        glm::vec3(48./255.,63./255.,159./255.),
+        glm::vec3(48./255.,63./255.,159./255.),
     };
 
     // Creació del Vertex Array Object per pintar
@@ -205,4 +220,6 @@ void MyGLWidget::carregaShaders()
     projLoc = glGetUniformLocation(program->programId(), "proj");
     viewLoc = glGetUniformLocation(program->programId(), "view");
 }
+
+
 
