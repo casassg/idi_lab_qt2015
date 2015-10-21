@@ -229,10 +229,10 @@ void MyGLWidget::createBuffers ()
     // Dades del terra
     // Dos VBOs, un amb posició i l'altre amb color
     glm::vec3 posterra[4] = {
-        glm::vec3(-1.0, -1.0, -1.0),
-        glm::vec3(-1.0, -1.0, 1.0),
-        glm::vec3(1.0, -1.0, -1.0),
-        glm::vec3(1.0, -1.0, 1.0)
+        glm::vec3(-2.0, -2.0, -2.0),
+        glm::vec3(-2.0, -2.0, 2.0),
+        glm::vec3(2.0, -2.0, -2.0),
+        glm::vec3(2.0, -2.0, 2.0)
     };
     glm::vec3 colterra[4] = {
         glm::vec3(48./255.,63./255.,159./255.),
