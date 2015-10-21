@@ -39,6 +39,9 @@ void MyGLWidget::initializeGL ()
     patricio.load("models/Patricio.obj");
     calcCapsaContenidora(patricio,patrMin,patrMax);
     ra=1;
+    latAng =0.;
+    eleAng =0.;
+
 
 
     glClearColor(0.5, 0.7, 1.0, 1.0); // defineix color de fons (d'esborrat)
@@ -121,15 +124,17 @@ double dist3Orig(glm::vec3 orig, glm::vec3 dest)
     double y=dest.y-orig.y;
     double z=dest.z-orig.z;
     double d = sqrt(x*x+y*y+z*z);
-    std::cout << "sqrt("<<x<<"²+"<<y<<"²+"<<z<<")="<<d<<std::endl;
+    //std::cout << "sqrt("<<x<<"²+"<<y<<"²+"<<z<<")="<<d<<std::endl;
     return d;
 }
 
 void MyGLWidget::viewTransform ()
 {
-    glm::vec3 centreCaixa ((patrMin.x+patrMax.x)/2,(patrMin.y+patrMax.y)/2,(patrMin.z+patrMax.z)/2);
-    double distZ = dist3Orig(centreCaixa,patrMax);
-    glm::mat4 view = glm::lookAt(glm::vec3(0.,0.,distZ),glm::vec3(0.,0.,0.),glm::vec3(0.,1.,0.));
+    glm::vec3 centreCaixa ((patrMin.x+patrMax.x)/2.,(patrMin.y+patrMax.y)/2.,(patrMin.z+patrMax.z)/2.);
+    double distZ = dist3Orig(centreCaixa,patrMin);
+    glm::mat4 view = glm::translate(glm::mat4(1.),glm::vec3(0.,0.,-distZ));
+    view = glm::rotate(view,eleAng,glm::vec3(1.,0.,0.));
+    view = glm::rotate(view,latAng,glm::vec3(0.,1.,0.));
     glUniformMatrix4fv(viewLoc,1,GL_FALSE,&view[0][0]);
 }
 

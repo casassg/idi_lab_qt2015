@@ -42,7 +42,7 @@ protected:
     // Program
     QGLShaderProgram *program;
     // Internal vars
-    float scale, rotateP,rotate;
+    float scale, rotateP,rotate, eleAng,latAng;
     double ra;
 
     glm::vec3 pos,patrMin,patrMax;
