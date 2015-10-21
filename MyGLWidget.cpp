@@ -93,8 +93,8 @@ void MyGLWidget::modelTransform ()
     // Matriu de transformació de model
     glm::mat4 transform = glm::rotate(glm::mat4(1.0f),rotate,glm::vec3(0.,1.,0.));
     transform = glm::scale(transform, glm::vec3(scale));
-    glm::vec3 centreCaixa (-(patrMin.x+patrMax.x)/2,-(patrMin.y+patrMax.y)/2,-(patrMin.z+patrMax.z)/2);
-    transform = glm::translate(transform,centreCaixa);
+    glm::vec3 centreCaixa ((patrMin.x+patrMax.x)/2,(patrMin.y+patrMax.y)/2,(patrMin.z+patrMax.z)/2);
+    transform = glm::translate(transform,-centreCaixa);
     glUniformMatrix4fv(transLoc, 1, GL_FALSE, &transform[0][0]);
 }
 
@@ -111,13 +111,25 @@ double calcFOV(double ra, double initialFOV)
 void MyGLWidget::projectTransform ()
 {
     double fov = calcFOV(ra,M_PI/2.);
-    glm::mat4 project = glm::perspective(fov,ra,1.,3.);
+    glm::mat4 project = glm::perspective(fov,ra,0.1,100.);
     glUniformMatrix4fv(projLoc,1,GL_FALSE,&project[0][0]);
+}
+
+double dist3Orig(glm::vec3 orig, glm::vec3 dest)
+{
+    double x=dest.x-orig.x;
+    double y=dest.y-orig.y;
+    double z=dest.z-orig.z;
+    double d = sqrt(x*x+y*y+z*z);
+    std::cout << "sqrt("<<x<<"²+"<<y<<"²+"<<z<<")="<<d<<std::endl;
+    return d;
 }
 
 void MyGLWidget::viewTransform ()
 {
-    glm::mat4 view = glm::lookAt(glm::vec3(0.,0.,2.),glm::vec3(0.,0.,0.),glm::vec3(0.,1.,0.));
+    glm::vec3 centreCaixa ((patrMin.x+patrMax.x)/2,(patrMin.y+patrMax.y)/2,(patrMin.z+patrMax.z)/2);
+    double distZ = dist3Orig(centreCaixa,patrMax);
+    glm::mat4 view = glm::lookAt(glm::vec3(0.,0.,distZ),glm::vec3(0.,0.,0.),glm::vec3(0.,1.,0.));
     glUniformMatrix4fv(viewLoc,1,GL_FALSE,&view[0][0]);
 }
 
@@ -135,13 +147,13 @@ void MyGLWidget::keyPressEvent(QKeyEvent* event)
     case Qt::Key_Escape:
         exit(0);
     case Qt::Key_S: { // escalar a més gran
-        scale += 0.05;
+        scale += 0.01;
         modelTransform ();
         updateGL();
         break;
     }
     case Qt::Key_D: { // escalar a més petit
-        scale -= 0.05;
+        scale -= 0.01;
         modelTransform ();
         updateGL();
         break;
