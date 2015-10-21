@@ -24,6 +24,9 @@ protected:
     // keyPressEvent - Es cridat quan es prem una tecla
     virtual void keyPressEvent (QKeyEvent *event);
 
+    virtual void mouseMoveEvent(QMouseEvent *eventPress);
+    virtual void mousePressEvent(QMouseEvent *event);
+
   private:
     void createBuffers ();
     void carregaShaders ();
@@ -44,6 +47,7 @@ protected:
     // Internal vars
     float scale, rotateP,rotate, eleAng,latAng;
     double ra;
+    QPoint lastPos;
 
     glm::vec3 pos,patrMin,patrMax;
     Model patricio;

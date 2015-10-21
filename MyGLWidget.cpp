@@ -7,6 +7,7 @@
 MyGLWidget::MyGLWidget (QGLFormat &f, QWidget* parent) : QGLWidget(f, parent)
 {
     setFocusPolicy(Qt::ClickFocus); // per rebre events de teclat
+    setMouseTracking(true);
     scale = 1.0f;
 }
 
@@ -41,8 +42,6 @@ void MyGLWidget::initializeGL ()
     ra=1;
     latAng =0.;
     eleAng =0.;
-
-
 
     glClearColor(0.5, 0.7, 1.0, 1.0); // defineix color de fons (d'esborrat)
     carregaShaders();
@@ -171,6 +170,25 @@ void MyGLWidget::keyPressEvent(QKeyEvent* event)
     }
     default: event->ignore(); break;
     }
+}
+
+void MyGLWidget::mousePressEvent(QMouseEvent *event)
+{
+ lastPos = event->pos();
+}
+
+
+void MyGLWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    float dx = (event->x() - lastPos.x()) / 10.0f;
+    float dy = (event->y() - lastPos.y())/ 10.0f;
+    if (event->buttons() & Qt::LeftButton){
+        eleAng+=dy*0.1;
+        latAng+=dx*0.1;
+    }
+    lastPos=event->pos();
+    viewTransform();
+    updateGL();
 }
 
 void MyGLWidget::createBuffers () 
