@@ -42,6 +42,7 @@ void MyGLWidget::initializeGL ()
     ra=1;
     latAng =0.;
     eleAng =0.;
+    initFOV = M_PI/2.;
 
     glClearColor(0.5, 0.7, 1.0, 1.0); // defineix color de fons (d'esborrat)
     carregaShaders();
@@ -112,7 +113,7 @@ double calcFOV(double ra, double initialFOV)
 
 void MyGLWidget::projectTransform ()
 {
-    double fov = calcFOV(ra,M_PI/2.);
+    double fov = calcFOV(ra,initFOV);
     glm::mat4 project = glm::perspective(fov,ra,0.1,100.);
     glUniformMatrix4fv(projLoc,1,GL_FALSE,&project[0][0]);
 }
@@ -165,6 +166,18 @@ void MyGLWidget::keyPressEvent(QKeyEvent* event)
     case Qt::Key_R: {
         rotateP+=M_PI/20;
         modelTransform ();
+        updateGL();
+        break;
+    }
+    case Qt::Key_Z: {
+        initFOV-=0.05;
+        projectTransform();
+        updateGL();
+        break;
+    }
+    case Qt::Key_X: {
+        initFOV+=0.05;
+        projectTransform();
         updateGL();
         break;
     }

@@ -46,7 +46,7 @@ protected:
     QGLShaderProgram *program;
     // Internal vars
     float scale, rotateP,rotate, eleAng,latAng;
-    double ra;
+    double ra,initFOV;
     QPoint lastPos;
 
     glm::vec3 pos,patrMin,patrMax;
