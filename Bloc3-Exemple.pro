@@ -3,12 +3,11 @@ QT         += opengl
 
 LIBS += -lGLEW
 INCLUDEPATH +=  /usr/include/glm
-INCLUDEPATH +=  Model
-
-RESOURCES += shaders.qrc
+INCLUDEPATH += Model
 
 HEADERS += MyGLWidget.h
 
+RESOURCES += shaders.qrc
+
 SOURCES += main.cpp \
-        MyGLWidget.cpp
-SOURCES += Model/model.cpp
+        MyGLWidget.cpp Model/model.cpp
