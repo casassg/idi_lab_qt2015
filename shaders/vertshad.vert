@@ -19,6 +19,7 @@ vec3 posFocus = vec3(1, 1, 1);  // en SCA
 
 out vec3 fcolor;
 
+//L es pos del focus de llum
 vec3 Lambert (vec3 NormSCO, vec3 L) 
 {
     // S'assumeix que els vectors que es reben com a paràmetres estan normalitzats
@@ -56,7 +57,12 @@ vec3 Phong (vec3 NormSCO, vec3 L, vec4 vertSCO)
 
 void main()
 {	
-    fcolor = matdiff;
+    vec4 vertSCO = (view * TG * vec4 (vertex, 1.0));
+    mat3 normalMatrix = inverse (transpose (mat3 (view * TG)));
+    vec3 normalSCO =  normalize(normalMatrix * normal);
+    vec4 focusSCO = view * vec4(posFocus,1.0);
+    vec3 L = normalize(focusSCO.xyz - vertSCO.xyz);
+    fcolor = Lambert(normalSCO,L);
 
-    gl_Position = proj * view * TG * vec4 (vertex, 1.0);
+    gl_Position = proj  * vertSCO;
 }
