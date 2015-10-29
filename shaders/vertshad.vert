@@ -62,7 +62,7 @@ void main()
     vec3 normalSCO =  normalize(normalMatrix * normal);
     vec4 focusSCO = view * vec4(posFocus,1.0);
     vec3 L = normalize(focusSCO.xyz - vertSCO.xyz);
-    fcolor = Lambert(normalSCO,L);
+    fcolor = Phong(normalSCO,L,vertSCO);
 
     gl_Position = proj  * vertSCO;
 }
