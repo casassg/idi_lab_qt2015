@@ -33,6 +33,7 @@ class MyGLWidget : public QGLWidget
     virtual void mousePressEvent (QMouseEvent *event);
     virtual void mouseReleaseEvent (QMouseEvent *event);
     virtual void mouseMoveEvent (QMouseEvent *event);
+    virtual void wheelEvent(QWheelEvent *e);
 
   private:
     void createBuffers ();
@@ -54,7 +55,7 @@ class MyGLWidget : public QGLWidget
     // paràmetres calculats a partir de la capsa contenidora del model
     glm::vec3 centrePatr;
     float escala;
-    double radiEsc;
+    double radiEsc, fov;
 
     typedef  enum {NONE, ROTATE} InteractiveAction;
     InteractiveAction DoingInteractive;

@@ -10,6 +10,7 @@ MyGLWidget::MyGLWidget (QGLFormat &f, QWidget* parent) : QGLWidget(f, parent)
   angleY = 0.0;
   DoingInteractive = NONE;
   radiEsc = sqrt(3);
+  fov = M_PI/3.0;
 }
 
 void MyGLWidget::initializeGL ()
@@ -281,7 +282,7 @@ void MyGLWidget::projectTransform ()
 {
   //sempre mantenim la aspect ratio de la pantalla per evitar deformacions
   glm::mat4 Proj;  // Matriu de projecció
-  Proj = glm::perspective(M_PI/3.0, 1.0, radiEsc, 3.*radiEsc);
+  Proj = glm::perspective(fov, 1.0, radiEsc, 3.*radiEsc);
 
   glUniformMatrix4fv (projLoc, 1, GL_FALSE, &Proj[0][0]);
 }
@@ -343,6 +344,18 @@ void MyGLWidget::mousePressEvent (QMouseEvent *e)
   {
     DoingInteractive = ROTATE;
   }
+}
+
+void MyGLWidget:: wheelEvent(QWheelEvent *e)
+{
+    int numDegrees = e->delta() / 8;
+    int numSteps = numDegrees / 15;
+
+    if (e->orientation() == Qt::Vertical) {
+        fov += 0.08 * numSteps;
+        projectTransform();
+    }
+    updateGL();
 }
 
 void MyGLWidget::mouseReleaseEvent( QMouseEvent *)
