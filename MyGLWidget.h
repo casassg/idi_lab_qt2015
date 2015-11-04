@@ -3,53 +3,64 @@
 #include <QGLShader>
 #include <QGLShaderProgram>
 #include <QKeyEvent>
-#include "model.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-class MyGLWidget : public QGLWidget {
+#include "model.h"
+
+class MyGLWidget : public QGLWidget 
+{
   Q_OBJECT
 
   public:
     MyGLWidget (QGLFormat &f, QWidget *parent=0);
-
-protected:
+  
+  protected:
     // initializeGL - Aqui incluim les inicialitzacions del contexte grafic.
-    virtual void initializeGL ( );
+    virtual void initializeGL ();
+
     // paintGL - Mètode cridat cada cop que cal refrescar la finestra.
     // Tot el que es dibuixa es dibuixa aqui.
-    virtual void paintGL ( );
-    // resizeGL - És cridat quan canvia la mida del widget
-    virtual void resizeGL (int width, int height);
-    // keyPressEvent - Es cridat quan es prem una tecla
-    virtual void keyPressEvent (QKeyEvent *event);
+    virtual void paintGL ();
+ 
+    // resizeGL - Es cridat quan canvi la mida del widget
+    virtual void resizeGL (int width, int height);  
 
-    virtual void mouseMoveEvent(QMouseEvent *eventPress);
-    virtual void mousePressEvent(QMouseEvent *event);
+    // keyPressEvent - Es cridat quan es prem una tecla
+    virtual void keyPressEvent (QKeyEvent *event); 
+    // mouse{Press/Release/Move}Event - Són cridades quan es realitza l'event 
+    // corresponent de ratolí
+    virtual void mousePressEvent (QMouseEvent *event);
+    virtual void mouseReleaseEvent (QMouseEvent *event);
+    virtual void mouseMoveEvent (QMouseEvent *event);
+    virtual void wheelEvent(QWheelEvent *e);
 
   private:
     void createBuffers ();
+    void carregaLlum();
     void carregaShaders ();
-    void modelTransform ();
     void projectTransform ();
     void viewTransform ();
-    void paintTerra();
-    void paintPatricio();
-    // attribute locations
-    GLuint vertexLoc, colorLoc;
-    // uniform locations
-    GLuint transLoc,projLoc,viewLoc;
+    void modelTransformTerra ();
+    void modelTransformPatricio ();
+    void calculaCapsaModel ();
+
     // VAO i VBO names
-    GLuint VAO_Patricio, VBO_Patricio, VBO_PatricioCol;
-    GLuint VAO_Terra, VBO_TerraPos, VBO_TerraCol;
-    // Program
+    GLuint VAO_Patr, VBO_PatrPos, VBO_PatrNorm, VBO_PatrMatamb, VBO_PatrMatdiff, VBO_PatrMatspec, VBO_PatrMatshin;
+    GLuint VAO_Terra, VBO_TerraPos, VBO_TerraNorm, VBO_TerraMatamb, VBO_TerraMatdiff, VBO_TerraMatspec, VBO_TerraMatshin;
     QGLShaderProgram *program;
-    // Internal vars
-    float scale, rotateP,rotate, eleAng,latAng;
-    double ra,initFOV;
-    QPoint lastPos;
 
-    glm::vec3 pos,patrMin,patrMax;
-    Model patricio;
+    GLuint transLoc, projLoc, viewLoc,posFocusLoc,colFocusLoc;
+    GLuint vertexLoc, normalLoc, matambLoc, matdiffLoc, matspecLoc, matshinLoc;
+    Model patr;
+    // paràmetres calculats a partir de la capsa contenidora del model
+    glm::vec3 centrePatr;
+    float escala;
+    double radiEsc, fov;
+    glm::vec3 posFocus;
+
+    typedef  enum {NONE, ROTATE} InteractiveAction;
+    InteractiveAction DoingInteractive;
+    int xClick, yClick;
+    float angleY;
 };
-
