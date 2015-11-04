@@ -37,6 +37,7 @@ class MyGLWidget : public QGLWidget
 
   private:
     void createBuffers ();
+    void carregaLlum();
     void carregaShaders ();
     void projectTransform ();
     void viewTransform ();
@@ -49,13 +50,14 @@ class MyGLWidget : public QGLWidget
     GLuint VAO_Terra, VBO_TerraPos, VBO_TerraNorm, VBO_TerraMatamb, VBO_TerraMatdiff, VBO_TerraMatspec, VBO_TerraMatshin;
     QGLShaderProgram *program;
 
-    GLuint transLoc, projLoc, viewLoc;
+    GLuint transLoc, projLoc, viewLoc,posFocusLoc,colFocusLoc;
     GLuint vertexLoc, normalLoc, matambLoc, matdiffLoc, matspecLoc, matshinLoc;
     Model patr;
     // paràmetres calculats a partir de la capsa contenidora del model
     glm::vec3 centrePatr;
     float escala;
     double radiEsc, fov;
+    glm::vec3 posFocus;
 
     typedef  enum {NONE, ROTATE} InteractiveAction;
     InteractiveAction DoingInteractive;

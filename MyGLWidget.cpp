@@ -11,6 +11,7 @@ MyGLWidget::MyGLWidget (QGLFormat &f, QWidget* parent) : QGLWidget(f, parent)
   DoingInteractive = NONE;
   radiEsc = sqrt(3);
   fov = M_PI/3.0;
+  posFocus = glm::vec3(0.,1.,-1.);
 }
 
 void MyGLWidget::initializeGL ()
@@ -23,6 +24,7 @@ void MyGLWidget::initializeGL ()
   glClearColor (0.5, 0.7, 1.0, 1.0);  // defineix color de fons (d'esborrat)
   glEnable(GL_DEPTH_TEST);
   carregaShaders ();
+  carregaLlum();
   createBuffers ();
   projectTransform ();
   viewTransform ();
@@ -260,6 +262,15 @@ void MyGLWidget::carregaShaders ()
   transLoc = glGetUniformLocation (program->programId(), "TG");
   projLoc = glGetUniformLocation (program->programId(), "proj");
   viewLoc = glGetUniformLocation (program->programId(), "view");
+  posFocusLoc = glGetUniformLocation (program->programId(), "posFocus");
+  colFocusLoc = glGetUniformLocation (program->programId(), "colFocus");
+}
+
+void MyGLWidget::carregaLlum()
+{
+    glUniform3fv(posFocusLoc,1,&posFocus[0]);
+    glm::vec3 colFocus(0.8,0.8,0.8);
+    glUniform3fv(colFocusLoc,1,&colFocus[0]);
 }
 
 void MyGLWidget::modelTransformPatricio ()
@@ -328,6 +339,15 @@ void MyGLWidget::keyPressEvent (QKeyEvent *e)
   {
     case Qt::Key_Escape:
         exit(0);
+        break;
+    case Qt::Key_K:
+      posFocus.x-=0.5;
+      carregaLlum();
+      break;
+  case Qt::Key_L:
+    posFocus.x+=0.5;
+    carregaLlum();
+    break;
 
     default: e->ignore(); break;
   }
