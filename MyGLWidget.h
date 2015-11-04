@@ -24,6 +24,9 @@ protected:
     // keyPressEvent - Es cridat quan es prem una tecla
     virtual void keyPressEvent (QKeyEvent *event);
 
+    virtual void mouseMoveEvent(QMouseEvent *eventPress);
+    virtual void mousePressEvent(QMouseEvent *event);
+
   private:
     void createBuffers ();
     void carregaShaders ();
@@ -31,21 +34,22 @@ protected:
     void projectTransform ();
     void viewTransform ();
     void paintTerra();
-    void paintHomer();
-
+    void paintPatricio();
     // attribute locations
     GLuint vertexLoc, colorLoc;
     // uniform locations
     GLuint transLoc,projLoc,viewLoc;
     // VAO i VBO names
-    GLuint VAO_Homer, VBO_Homer, VBO_HomerCol;
+    GLuint VAO_Patricio, VBO_Patricio, VBO_PatricioCol;
     GLuint VAO_Terra, VBO_TerraPos, VBO_TerraCol;
     // Program
     QGLShaderProgram *program;
     // Internal vars
-    float scale, rotateH,rotate;
+    float scale, rotateP,rotate, eleAng,latAng;
+    double ra,initFOV;
+    QPoint lastPos;
 
-    glm::vec3 pos;
-    Model homer;
+    glm::vec3 pos,patrMin,patrMax;
+    Model patricio;
 };
 

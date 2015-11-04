@@ -1,12 +1,32 @@
 #include <GL/glew.h>
 #include "MyGLWidget.h"
+#include <cmath>
 
 #include <iostream>
 
 MyGLWidget::MyGLWidget (QGLFormat &f, QWidget* parent) : QGLWidget(f, parent)
 {
     setFocusPolicy(Qt::ClickFocus); // per rebre events de teclat
+    setMouseTracking(true);
     scale = 1.0f;
+}
+
+void calcCapsaContenidora(const Model &model,glm::vec3& min,glm::vec3& max)
+{
+    min.x = max.x = model.vertices()[0];
+    min.y = max.y = model.vertices()[1];
+    min.z = max.z = model.vertices()[2];
+    for(unsigned int i = 3;i<model.vertices().size();i+=3) {
+        double x = model.vertices()[i];
+        double y = model.vertices()[i+1];
+        double z = model.vertices()[i+2];
+        if(x<min.x) min.x = x;
+        else if (x>max.x) max.x = x;
+        if(y<min.y) min.y = y;
+        else if (y>max.y) max.y = y;
+        if(z<min.z) min.z = z;
+        else if (z>max.z) max.z = z;
+    }
 }
 
 void MyGLWidget::initializeGL () 
@@ -16,9 +36,13 @@ void MyGLWidget::initializeGL ()
     glEnable (GL_DEPTH_TEST);
     glewInit();
     glGetError();  // Reinicia la variable d'error d'OpenGL
-    homer.load("models/HomerProves.obj");
 
-
+    patricio.load("models/Patricio.obj");
+    calcCapsaContenidora(patricio,patrMin,patrMax);
+    ra=1;
+    latAng =0.;
+    eleAng =0.;
+    initFOV = M_PI/2.;
 
     glClearColor(0.5, 0.7, 1.0, 1.0); // defineix color de fons (d'esborrat)
     carregaShaders();
@@ -28,16 +52,18 @@ void MyGLWidget::initializeGL ()
     viewTransform();
 }
 
-void MyGLWidget::paintHomer()
+
+
+void MyGLWidget::paintPatricio()
 {
     float temp = rotate;
-    rotate=rotateH;
+    rotate=rotateP;
     modelTransform();
     rotate = temp;
     // Activem el VAO per a pintar la caseta
-    glBindVertexArray (VAO_Homer);
+    glBindVertexArray (VAO_Patricio);
     // pintem
-    glDrawArrays (GL_TRIANGLES, 0, homer.faces().size () * 3);
+    glDrawArrays (GL_TRIANGLES, 0, patricio.faces().size () * 3);
 }
 
 void MyGLWidget::paintTerra()
@@ -57,8 +83,8 @@ void MyGLWidget::paintGL ()
     // Esborrem el frame-buffer
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    paintHomer();
-    paintTerra();
+    paintPatricio();
+    //paintTerra();
 
 
 
@@ -70,24 +96,53 @@ void MyGLWidget::modelTransform ()
     // Matriu de transformació de model
     glm::mat4 transform = glm::rotate(glm::mat4(1.0f),rotate,glm::vec3(0.,1.,0.));
     transform = glm::scale(transform, glm::vec3(scale));
-    transform = glm::rotate(transform, .58f, glm::vec3(1.,0.,0.));
+    glm::vec3 centreCaixa ((patrMin.x+patrMax.x)/2,(patrMin.y+patrMax.y)/2,(patrMin.z+patrMax.z)/2);
+    transform = glm::translate(transform,-centreCaixa);
     glUniformMatrix4fv(transLoc, 1, GL_FALSE, &transform[0][0]);
+}
+
+double calcFOV(double ra, double initialFOV)
+{
+    if(ra>=1)return initialFOV;
+    else {
+        double alpha = initialFOV/2;
+        double newAlpha = atan(tan(alpha)/ra);
+        return newAlpha*2;
+    }
 }
 
 void MyGLWidget::projectTransform ()
 {
-    glm::mat4 project = glm::perspective(M_PI/2.,1.,1.,3.);
+    double fov = calcFOV(ra,initFOV);
+    glm::mat4 project = glm::perspective(fov,ra,0.1,100.);
     glUniformMatrix4fv(projLoc,1,GL_FALSE,&project[0][0]);
+}
+
+double dist3Orig(glm::vec3 orig, glm::vec3 dest)
+{
+    double x=dest.x-orig.x;
+    double y=dest.y-orig.y;
+    double z=dest.z-orig.z;
+    double d = sqrt(x*x+y*y+z*z);
+    //std::cout << "sqrt("<<x<<"²+"<<y<<"²+"<<z<<")="<<d<<std::endl;
+    return d;
 }
 
 void MyGLWidget::viewTransform ()
 {
-    glm::mat4 view = glm::lookAt(glm::vec3(0.,0.,2.),glm::vec3(0.,0.,0.),glm::vec3(0.,1.,0.));
+    glm::vec3 centreCaixa ((patrMin.x+patrMax.x)/2.,(patrMin.y+patrMax.y)/2.,(patrMin.z+patrMax.z)/2.);
+    double distZ = dist3Orig(centreCaixa,patrMin);
+    glm::mat4 view = glm::translate(glm::mat4(1.),glm::vec3(0.,0.,-distZ));
+    view = glm::rotate(view,eleAng,glm::vec3(1.,0.,0.));
+    view = glm::rotate(view,latAng,glm::vec3(0.,1.,0.));
     glUniformMatrix4fv(viewLoc,1,GL_FALSE,&view[0][0]);
 }
 
 void MyGLWidget::resizeGL (int w, int h) 
 {
+    ra = (double)w/(double)h;
+    projectTransform();
+    updateGL();
     glViewport(0, 0, w, h);
 }
 
@@ -97,20 +152,32 @@ void MyGLWidget::keyPressEvent(QKeyEvent* event)
     case Qt::Key_Escape:
         exit(0);
     case Qt::Key_S: { // escalar a més gran
-        scale += 0.05;
+        scale += 0.01;
         modelTransform ();
         updateGL();
         break;
     }
     case Qt::Key_D: { // escalar a més petit
-        scale -= 0.05;
+        scale -= 0.01;
         modelTransform ();
         updateGL();
         break;
     }
     case Qt::Key_R: {
-        rotateH+=M_PI/4;
+        rotateP+=M_PI/20;
         modelTransform ();
+        updateGL();
+        break;
+    }
+    case Qt::Key_Z: {
+        initFOV-=0.05;
+        projectTransform();
+        updateGL();
+        break;
+    }
+    case Qt::Key_X: {
+        initFOV+=0.05;
+        projectTransform();
         updateGL();
         break;
     }
@@ -118,23 +185,42 @@ void MyGLWidget::keyPressEvent(QKeyEvent* event)
     }
 }
 
+void MyGLWidget::mousePressEvent(QMouseEvent *event)
+{
+ lastPos = event->pos();
+}
+
+
+void MyGLWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    float dx = (event->x() - lastPos.x()) / 10.0f;
+    float dy = (event->y() - lastPos.y())/ 10.0f;
+    if (event->buttons() & Qt::LeftButton){
+        eleAng+=dy*0.1;
+        latAng+=dx*0.1;
+    }
+    lastPos=event->pos();
+    viewTransform();
+    updateGL();
+}
+
 void MyGLWidget::createBuffers () 
 {
     // Creació del Vertex Array Object per pintar
-    glGenVertexArrays(1, &VAO_Homer);
-    glBindVertexArray(VAO_Homer);
+    glGenVertexArrays(1, &VAO_Patricio);
+    glBindVertexArray(VAO_Patricio);
 
-    glGenBuffers(1, &VBO_Homer);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_Homer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * homer.faces().size() * 3 * 3, homer.VBO_vertices(), GL_STATIC_DRAW);
+    glGenBuffers(1, &VBO_Patricio);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_Patricio);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * patricio.faces().size() * 3 * 3, patricio.VBO_vertices(), GL_STATIC_DRAW);
 
     // Activem l'atribut vertexLoc
     glVertexAttribPointer(vertexLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(vertexLoc);
 
-    glGenBuffers(1, &VBO_HomerCol);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_HomerCol);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * homer.faces().size() * 3 * 3, homer.VBO_matdiff(), GL_STATIC_DRAW);
+    glGenBuffers(1, &VBO_PatricioCol);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_PatricioCol);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * patricio.faces().size() * 3 * 3, patricio.VBO_matdiff(), GL_STATIC_DRAW);
 
     // Activem l'atribut colorLoc
     glVertexAttribPointer(colorLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -143,16 +229,16 @@ void MyGLWidget::createBuffers ()
     // Dades del terra
     // Dos VBOs, un amb posició i l'altre amb color
     glm::vec3 posterra[4] = {
-        glm::vec3(-1.0, -1.0, -1.0),
-        glm::vec3(-1.0, -1.0, 1.0),
-        glm::vec3(1.0, -1.0, -1.0),
-        glm::vec3(1.0, -1.0, 1.0)
+        glm::vec3(-2.0, -2.0, -2.0),
+        glm::vec3(-2.0, -2.0, 2.0),
+        glm::vec3(2.0, -2.0, -2.0),
+        glm::vec3(2.0, -2.0, 2.0)
     };
     glm::vec3 colterra[4] = {
-        glm::vec3(1,0,1),
-        glm::vec3(1,0,1),
-        glm::vec3(1,0,1),
-        glm::vec3(1,0,1)
+        glm::vec3(48./255.,63./255.,159./255.),
+        glm::vec3(48./255.,63./255.,159./255.),
+        glm::vec3(48./255.,63./255.,159./255.),
+        glm::vec3(48./255.,63./255.,159./255.),
     };
 
     // Creació del Vertex Array Object per pintar
@@ -205,4 +291,6 @@ void MyGLWidget::carregaShaders()
     projLoc = glGetUniformLocation(program->programId(), "proj");
     viewLoc = glGetUniformLocation(program->programId(), "view");
 }
+
+
 
