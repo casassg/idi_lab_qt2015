@@ -2,6 +2,9 @@
 #include "glm/glm.hpp"
 #include <QGLShader>
 #include <QGLShaderProgram>
+#include <glm/gtc/matrix_transform.hpp>
+#define GLM_FORCE_RADIANS
+
 
 class MyGLWidget : public QGLWidget 
 {
@@ -21,14 +24,19 @@ class MyGLWidget : public QGLWidget
     // resizeGL() - Es cridat quan canvi la mida del widget
     virtual void resizeGL (int width, int height);  
 
+    virtual void keyPressEvent(QKeyEvent * e);
+
   private:
     void createBuffers ();
 
     void loadShaders();
 
+    void modelTransform(const glm::vec3& transChange,double scaleXChange,double scaleYChange);
+
 
     GLuint VAO[2],VBO,VBO2,VBOTC;
     GLint  color_loc;
     QGLShaderProgram *program;
-
+    glm::vec3 transVec;
+    double scaleX,scaleY;
 };

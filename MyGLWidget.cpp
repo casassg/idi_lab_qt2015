@@ -2,6 +2,8 @@
 #include <QGLShader>
 #include <QGLShaderProgram>
 #include "MyGLWidget.h"
+#include <QKeyEvent>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <iostream>
 
@@ -20,11 +22,15 @@ void MyGLWidget::initializeGL ()
   glClearColor (0.5, 0.7, 1.0, 1.0); // defineix color de fons (d'esborrat)
   loadShaders();
   createBuffers();
+  transVec = glm::vec3(0.);
+  scaleX = 1.;
+  scaleY = 1.;
+  modelTransform(glm::vec3(0.),0.,0.);
 }
 
 void MyGLWidget::paintGL ()
 {
-  program->bind();
+
 
   glClear (GL_COLOR_BUFFER_BIT);  // Esborrem el frame-buffer
 
@@ -32,20 +38,30 @@ void MyGLWidget::paintGL ()
   glBindVertexArray(VAO[0]);
  
   // Pintem l'escena
-  glDrawArrays(GL_TRIANGLES, 0, 9);
+  glDrawArrays(GL_TRIANGLES, 0, 3);
   
-  // Desactivem el VAO
-  glBindVertexArray(0);
-  glBindVertexArray(VAO[1]);
-
-  glDrawArrays(GL_TRIANGLES,0,12);
-
   glBindVertexArray(0);
 }
 
 void MyGLWidget::resizeGL (int w, int h)
 {
   glViewport (0, 0, w, h);
+}
+
+void MyGLWidget::modelTransform(const glm::vec3& transChange,double scaleXChange,double scaleYChange) {
+    float rad = 0.785398;
+    glm::mat4 TG = glm::mat4(1.f);
+    transVec = transVec+transChange;
+    TG = glm::translate(TG,transVec);
+    TG = glm::rotate(TG,rad,glm::vec3(0.,0.,1.));
+    scaleX = scaleX + scaleXChange;
+    scaleY = scaleY + scaleYChange;
+    TG = glm::scale(TG,glm::vec3(scaleX,scaleY, 1.));
+
+
+    //Passem al Vertex shader
+    GLint posTG = glGetUniformLocation(program->programId(),"TG");
+    glUniformMatrix4fv (posTG, 1, GL_FALSE, &TG[0][0]);
 }
 
 void MyGLWidget::createBuffers ()
@@ -99,5 +115,38 @@ void MyGLWidget::loadShaders(){
     program->addShader(&fs);
     program->addShader(&vs);
     program->link();
+    program->bind();
+}
+
+void MyGLWidget::keyPressEvent(QKeyEvent *e) {
+    switch (e->key()) {
+        case Qt::Key_Left:
+            modelTransform(glm::vec3(-0.01,0.,0.),0.,0.);
+            break;
+        case Qt::Key_Right:
+            modelTransform(glm::vec3(+0.01,0.,0.),0.,0.);
+            break;
+        case Qt::Key_Up:
+            modelTransform(glm::vec3(0.,+0.01,0.),0.,0.);
+            break;
+        case Qt::Key_Down:
+            modelTransform(glm::vec3(0.,-0.01,0.),0.,0.);
+            break;
+        case Qt::Key_S:
+            modelTransform(glm::vec3(0.,0.,0.),0.01,0.);
+            break;
+        case Qt::Key_D:
+            modelTransform(glm::vec3(0.,0.,0.),-0.01,0.);
+            break;
+        case Qt::Key_E:
+            modelTransform(glm::vec3(0.,0.,0.),0.,0.01);
+            break;
+        case Qt::Key_X:
+            modelTransform(glm::vec3(0.,0.,0.),0.,-0.01);
+            break;
+        default:
+            break;
+    }
+    updateGL();
 }
 

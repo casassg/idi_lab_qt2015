@@ -3,6 +3,8 @@
 *.core
 qrc_shaders.cpp
 moc_MyGLWidget.cpp
+pdf
+Bloc1_Exemple
 
 # C++ objects and libs
 
