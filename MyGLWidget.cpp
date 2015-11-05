@@ -8,10 +8,11 @@ MyGLWidget::MyGLWidget (QGLFormat &f, QWidget* parent) : QGLWidget(f, parent)
   setFocusPolicy(Qt::ClickFocus);  // per rebre events de teclat
   xClick = yClick = 0;
   angleY = 0.0;
+  angleX = 0.0;
   DoingInteractive = NONE;
   radiEsc = sqrt(3);
   fov = M_PI/3.0;
-  posFocus = glm::vec3(0.,1.,-1.);
+  posFocus = glm::vec3(0.,0.,0.);//en SCO
 }
 
 void MyGLWidget::initializeGL ()
@@ -23,6 +24,7 @@ void MyGLWidget::initializeGL ()
 
   glClearColor (0.5, 0.7, 1.0, 1.0);  // defineix color de fons (d'esborrat)
   glEnable(GL_DEPTH_TEST);
+  //glEnable(GL_CULL_FACE);
   carregaShaders ();
   carregaLlum();
   createBuffers ();
@@ -149,10 +151,10 @@ void MyGLWidget::createBuffers ()
   };
 
   // Definim el material del terra
-  glm::vec3 amb(0,0,0.6);
-  glm::vec3 diff(0,0,1);
-  glm::vec3 spec(1,1,1);
-  float shin = 10000;
+  glm::vec3 amb(0,0,0.5);
+  glm::vec3 diff(0,0,0.9);
+  glm::vec3 spec(1.,1.,1.);
+  float shin = 100;
 
   // Fem que aquest material afecti a tots els vèrtexs per igual
   glm::vec3 matambterra[12] = {
@@ -303,6 +305,7 @@ void MyGLWidget::viewTransform ()
   glm::mat4 View;  // Matriu de posició i orientació
   View = glm::translate(glm::mat4(1.f), glm::vec3(0, 0, -2*radiEsc));
   View = glm::rotate(View, -angleY, glm::vec3(0, 1, 0));
+  View = glm::rotate(View, -angleX, glm::vec3(1, 0, 0));
 
   glUniformMatrix4fv (viewLoc, 1, GL_FALSE, &View[0][0]);
 }
@@ -341,11 +344,11 @@ void MyGLWidget::keyPressEvent (QKeyEvent *e)
         exit(0);
         break;
     case Qt::Key_K:
-      posFocus.x-=0.5;
+      posFocus.x-=0.2;
       carregaLlum();
       break;
   case Qt::Key_L:
-    posFocus.x+=0.5;
+    posFocus.x+=0.2;
     carregaLlum();
     break;
 
@@ -390,6 +393,7 @@ void MyGLWidget::mouseMoveEvent(QMouseEvent *e)
   {
     // Fem la rotació
     angleY += (e->x() - xClick) * M_PI / 180.0;
+    angleX += (e->y() - yClick) * M_PI / 180.0;
     viewTransform ();
   }
 

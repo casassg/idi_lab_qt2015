@@ -62,5 +62,5 @@ class MyGLWidget : public QGLWidget
     typedef  enum {NONE, ROTATE} InteractiveAction;
     InteractiveAction DoingInteractive;
     int xClick, yClick;
-    float angleY;
+    float angleY, angleX;
 };
