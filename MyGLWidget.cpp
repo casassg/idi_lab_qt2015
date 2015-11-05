@@ -154,7 +154,7 @@ void MyGLWidget::createBuffers ()
   glm::vec3 amb(0,0,0.5);
   glm::vec3 diff(0,0,0.9);
   glm::vec3 spec(1.,1.,1.);
-  float shin = 100;
+  float shin = 300;
 
   // Fem que aquest material afecti a tots els vèrtexs per igual
   glm::vec3 matambterra[12] = {
@@ -271,7 +271,7 @@ void MyGLWidget::carregaShaders ()
 void MyGLWidget::carregaLlum()
 {
     glUniform3fv(posFocusLoc,1,&posFocus[0]);
-    glm::vec3 colFocus(0.8,0.8,0.8);
+    glm::vec3 colFocus(1,1,1);
     glUniform3fv(colFocusLoc,1,&colFocus[0]);
 }
 
